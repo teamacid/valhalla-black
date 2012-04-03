@@ -1,0 +1,8 @@
+#!/system/bin/sh
+echo 'Running mount_rw'
+
+# Make /system and / read/write
+busybox mount -o rw,remount /system
+busybox mount -o rw,remount /
+
+sync;

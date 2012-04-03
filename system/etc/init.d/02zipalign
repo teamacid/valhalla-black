@@ -6,12 +6,22 @@
 # Changelog:
 # 1.1 (12/1/09) Switched to zipalign -c 4 to check the apk instead of MD5 (oknowton)
 # 1.0 (11/30/09) Original
+echo 'Running zipalign'
 
-LOG_FILE=/data/teamkang/logs/zipalign.log
-    if [ -e $LOG_FILE ]; then
-    	rm $LOG_FILE;
-    fi;
-    	
+mkdir -p /data/logs/
+LOG_FILE=/data/logs/zipalign.log
+
+# If we find the log file and it's 7 days old, then we delete it
+find $LOG_FILE -type f -mtime +7
+if test -f $LOG_FILE; then
+  # If the log was found by now, it means it was less than a week old, so we exit
+  echo '  zipalign was run less than 7 days ago, exiting'
+  exit
+fi
+
+# Since it's been more than a week since we ran the zipalign, create a new log file
+rm -rf $LOG_FILE
+
 echo "Starting Automatic ZipAlign $( date +"%m-%d-%Y %H:%M:%S" )" | tee -a $LOG_FILE;
     for apk in /data/app/*.apk ; do
 	zipalign -c 4 $apk;

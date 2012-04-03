@@ -1,0 +1,14 @@
+#!/system/bin/sh
+echo 'Running complete'
+
+# Remounts
+busybox mount -o remount,noatime,nobh,nodiratime,nodelalloc,noauto_da_alloc,barrier=0 /system /system
+busybox mount -o remount,noatime,nobh,nodiratime,nodelalloc,noauto_da_alloc,barrier=0 /cache /cache
+busybox mount -o remount,noatime,nodiratime,delalloc,noauto_da_alloc,barrier=0 /data /data
+
+# Make /system and / read only
+busybox mount -o ro,remount /system
+busybox mount -o ro,remount /
+
+sync;
+setprop cm.filesystem.ready 1;
