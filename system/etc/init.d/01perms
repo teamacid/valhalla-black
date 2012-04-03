@@ -23,14 +23,16 @@ for file in /system/app/* /system/framework/* /data/app/*; do
   chmod 0644 $file
 done
 
-# su
-chmod 06755 /system/bin/su
-chmod 06755 /system/xbin/su
-
 # init.d and /system/xbin
 echo "  chmodding init.d and xbin" >> $logFile
 chmod 0755 /system/etc/init.d
 for file in /system/etc/init.d/* /system/xbin/*; do
   chmod 0755 $file
 done
+
+# su
+echo "  chmodding su" >> $logFile
+chmod 06755 /system/bin/su
+chmod 06755 /system/xbin/su
+
 echo "Permissions set" >> $logFile
