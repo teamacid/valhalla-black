@@ -1,0 +1,15 @@
+#!/system/bin/sh
+#
+
+sync
+
+
+echo 300000 > /proc/sys/kernel/sched_latency_ns
+
+echo 125000 > /proc/sys/kernel/sched_min_granularity_ns
+
+echo 125000 > /proc/sys/kernel/sched_wakeup_granualarity_ns
+
+echo 15000 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
+
+echo 15 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/up_threshold

@@ -1,0 +1,6 @@
+#!/system/bin/sh
+# 
+
+mount -t debugfs none /sys/kernel/debug
+echo NO_GENTLE_FAIR_SLEEPERS > /sys/kernel/debug/sched_features
+unmount /sys/kernel/debug

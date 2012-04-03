@@ -1,0 +1,498 @@
+#!/system/bin/sh
+#
+# mod version V51
+# screenstate_scaling - switch CPU frequency governor on screen state change
+# florian.schaefer@gmail.com (FloHimself)
+# modifications by zacharias.maladroit and 'well.heeled.man'
+# modifications & ideas taken from: ckMod SSSwitch by voku1987 and "battery tweak" (collin_ph@xda)
+# for Changelog and experimental settings: see bottom part of this file
+
+insmod /lib/modules/cpufreq_conservative.ko;
+
+# =========
+# Memory tweaks for non-screenstate-scaling usage
+# =========
+# (currently none)
+# =========
+
+
+
+# =========
+# Description, howto:
+# =========
+
+# for uncommenting settings remove the preceding diamond/rhomb-sign (#) at the beginning of the line
+# and remember to comment the other settings otherwise they will fight with each other and you might
+# see inconsistent results
+
+
+# ==============================================================
+# ==============================================================
+# Description of the governors:
+# ==============================================================
+# ==============================================================
+
+# =========
+# (1) battery-saving
+# =========
+# [might be laggy and slow- problems during wake-up/phone-answering or when screen is unlocked - due to powersave governor]
+# =========
+# choose conservative or ondemand governor with aggressive powersaving settings - while screen is ON
+# choose powersave governor - while is OFF
+# =========
+
+# =========
+# (2) interactive #
+# =========
+# [phone gets warm faster and experience is not overall consistent, 
+# interactive governor tweaked for power savings but still consuming more battery
+# staying longer at higher frequencies]
+# =========
+# combine with conservative governor while screen is off ! [recommended]
+# =========
+
+# =========
+# (3) smartass #
+# =========
+# [best compromise between super-smooth operation and battery savings while screen is off
+# when idle while screen is on the battery consumption might be a tad bit high]
+# =========
+# combine with conservative governor while screen is off ! [recommended]
+#
+# can also be used while screen is ON and screen is OFF [AWAKE and SLEEP governor] - might result
+# in higher battery consumption but smoother overall experience (fast wakeup when unlocking
+# and answering the phone - might have some stability-issues though and "hang" at high
+# frequencies for some time)
+# =========
+
+# =========
+# (4) interactiveX #
+# =========
+# [phone gets warm faster and experience is not overall consistent, 
+# the phone might be consuming more battery
+# staying longer at higher frequencies - this governor is suited as "one governor for all"
+# to be used when screen is ON and when screen is OFF - AWAKE & SLEEP governor]
+# =========
+
+# =========
+# (5) conservative #
+# =========
+# [multi-purpose governor - very battery-saving with default settings
+# can be tweaked to jump to high frequencies fast while leaving out mid-frequencies
+# when tweaked to be *very* aggressive & resulting in higher
+# quadrant scores than with ondemand & acceptable experience still with
+# power-efficiency in mind - in my opinion more consistent experience
+# less micro-lags & thought-time than with ondemand governor]
+# =========
+# combine with conservative governor while screen is off ! [recommended]
+# =========
+
+# =========
+# (6) ondemand #
+# =========
+# [kernel default and multi-purpose governor
+# can be tweaked to be fast & power efficient
+# it quickly jumps from lowest to highest frequency and meanwhile
+# also uses mid-frequencies when applicable
+# gets more attention from the upstream kernel devs and is continually optimised
+# its "flaw" from my experience: it's not really smooth enough in demanding GUIs 
+# such as MIUI, TouchWiz, even ADWLauncher might show "micro lags"]
+# =========
+# combine with conservative governor while screen is off ! [recommended]
+# =========
+
+
+# ==============================================================
+# ==============================================================
+# step [1] choose AWAKE governor while screen is ON
+# ==============================================================
+# ==============================================================
+# selection of AWAKE Governors:
+# =========
+# only keep ONE governor uncommented at a time !!!!:
+# =========
+
+#AWAKE_GOVERNOR="conservative"
+AWAKE_GOVERNOR="ondemand" # [no additional settings required, tweaking done in kernel-source]
+#AWAKE_GOVERNOR="ondemandX"
+#AWAKE_GOVERNOR="interactive"
+#AWAKE_GOVERNOR="interactiveX"
+#AWAKE_GOVERNOR="smartass"
+#AWAKE_GOVERNOR="smartassV2"
+
+
+# ==============================================================
+# ==============================================================
+# step [2] choose SLEEP governor while screen is OFF
+# ==============================================================
+# ==============================================================
+# selection of SLEEP Governors:
+# =========
+# only keep ONE governor uncommented at a time !!!!:
+# =========
+
+SLEEP_GOVERNOR="conservative"
+#SLEEP_GOVERNOR="ondemand" # [no additional settings required, tweaking done in kernel-source]
+#SLEEP_GOVERNOR="interactive" # NOT recommended
+#SLEEP_GOVERNOR="interactiveX"
+#SLEEP_GOVERNOR="smartass"
+#SLEEP_GOVERNOR="powersave" # [no additional settings required, powersave only stays at 100 MHz]
+#AWAKE_GOVERNOR="smartassV2"
+
+
+
+
+
+
+
+
+
+
+
+# ==============================================================
+# ==============================================================
+# beginning of the screenstate-scaling loop
+# ==============================================================
+# ==============================================================
+
+
+(while [ 1 ]
+do
+
+
+# ==============================================================
+# ==============================================================
+# ==============================================================
+# settings for while the screen is on / usage
+# ==============================================================
+# ==============================================================
+# ==============================================================
+
+    AWAKE=`cat /sys/power/wait_for_fb_wake`
+    if [ $AWAKE = "awake" ]; then
+        sleep 2 && echo $AWAKE_GOVERNOR > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor;
+
+
+		echo "15" > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/up_threshold;
+
+# ==============================================================
+# ==============================================================
+# step [3] tweaks to the governor while screen is ON (phone in use)
+# ==============================================================
+# ==============================================================
+        # ==============================================================
+# limiting the max/min frequencies [not used by default]
+# ==============================================================
+# =========
+# set maximum & minimum frequency to 100 & 1000 MHz (1 GHz)
+# =========
+#echo "1000000" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+#echo "100000" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+
+
+# =========
+# (3) smartass #
+# =========
+# Smartass settings (slightly more battery friendly than Glitch Kernel defaults - peformance penalty unclear)
+# =========
+
+#       echo "50" > /sys/devices/system/cpu/cpu0/cpufreq/smartass/max_cpu_load # 76 # 47
+#       echo "35" > /sys/devices/system/cpu/cpu0/cpufreq/smartass/min_cpu_load # 30 # 39
+#       echo "800000" > /sys/devices/system/cpu/cpu0/cpufreq/smartass/up_min_freq
+#       echo "400000" > /sys/devices/system/cpu/cpu0/cpufreq/smartass/sleep_max_freq
+
+
+# =========
+# (5) conservative aka "One governor to rule them all"
+# =========
+# =========
+# Conservative settings [SavagedZen governor-like] (recommended)
+# =========
+
+#        echo "50" > /sys/devices/system/cpu/cpufreq/conservative/up_threshold # 50 # 76 # 76
+#        echo "35" > /sys/devices/system/cpu/cpufreq/conservative/down_threshold # 35 # 12 # 30 (higher will lead to noticable lags) # 35
+#        echo "50" > /sys/devices/system/cpu/cpufreq/conservative/freq_step # more aggressive ramping up (50)
+######        echo "280000" > /sys/devices/system/cpu/cpu0/cpufreq/conservative/sampling_rate # 375000 # 500000
+
+
+
+
+
+
+
+
+
+# =========
+# (1) max battery # [with ondemand & powersave while phone in "sleep" [screen off] mode]
+# =========
+# [might have lags during wake-up/phone-answering or when screen is unlocked]
+# =========
+
+#SLEEP_GOVERNOR="powersave" # [no additional settings required, powersave only stays at 100 MHz]
+
+# =========
+# (1) max battery # [with conservative & powersave while phone in "sleep" [screen off] mode]
+# =========
+# Conservative settings [all frequencies using, noticably laggy when used while screen is on - needs time to ramp up] (compromise between speed/lags)
+# =========
+
+#        echo "70" > /sys/devices/system/cpu/cpufreq/conservative/up_threshold # 50 # 76 # 76
+#        echo "30" > /sys/devices/system/cpu/cpufreq/conservative/down_threshold # 35 # 12 # 30 (higher will lead to noticable lags)
+#        echo "10" > /sys/devices/system/cpu/cpufreq/conservative/freq_step # more aggressive ramping up (50)
+
+
+#SLEEP_GOVERNOR="conservative"
+
+#AWAKE_GOVERNOR="smartass"
+#SLEEP_GOVERNOR="conservative"
+
+
+# =========
+# (4) ondemand #
+# =========
+# [default governor but tweaked in preparation for BFS usage, should be smooth
+# scales through all frequencies and might consume equally or even less 
+# than conservative governor
+# while screen is off - conservative governor]
+# =========
+
+#AWAKE_GOVERNOR="ondemand"
+#SLEEP_GOVERNOR="conservative"
+
+
+# =========
+# (5) One governor to rule them all aka all the way conservative [good trade-off between responsiveness and power-saving features]
+# =========
+
+#AWAKE_GOVERNOR="conservative"
+#SLEEP_GOVERNOR="conservative"
+
+
+
+
+
+
+# =========
+# dirty_ratio & vfs_cache_pressure: too high (dirty_ratio) and too low values (vfs_cache_pressure) might fill up the RAM too much and end up triggering the OOM killer
+# =========
+
+# =========
+# stuff moved to the system_tweak script
+# =========
+
+#        log -p i -t screenstate_scaling "***  awake   ***: switching CPU frequency governor to -> $AWAKE_GOVERNOR"
+        AWAKE=
+    fi;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ==============================================================
+# ==============================================================
+# ==============================================================
+# settings for while the screen is off
+# ==============================================================
+# ==============================================================
+# ==============================================================
+
+    SLEEPING=`cat /sys/power/wait_for_fb_sleep`
+    if [ $SLEEPING = "sleeping" ]; then
+        sleep 2 && echo $SLEEP_GOVERNOR > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor;
+
+
+# ==============================================================
+# ==============================================================
+# step [4] tweaks to the governor while screen is OFF (phone in idle or doing its thing on its on)
+# ==============================================================
+# ==============================================================
+# ==============================================================
+# limiting the max/min frequencies [not used by default]
+# ==============================================================
+# =========
+# set maximum & minimum frequency to 100 & 400 MHz - that should hopefully be enough for DSP effects & prevent buggy apps from draining the battery too much
+# =========
+#echo "400000" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+#echo "100000" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+
+
+
+
+# =========
+# (2) interactive, (3) smartass, (4) ondemand, (5) conservative #
+# =========
+
+# =========
+# Conservative settings [SavagedZen governor-like] (recommended when screen on, might consume more battery when screen off since it does not scale through all frequencies)
+# settings for screen off (can be more aggressive)
+# =========
+
+        echo "70" > /sys/devices/system/cpu/cpufreq/conservative/up_threshold; # 50 # 76 # 76 # screen off: # 90 (probably too high) # 76 (sound stuttering with EQ and some apps) ## 50
+        echo "35" > /sys/devices/system/cpu/cpufreq/conservative/down_threshold; # 35 # 12 # 30 (higher will lead to noticable lags) # 35 # screen off: # 50 ## 35
+        echo "5" > /sys/devices/system/cpu/cpufreq/conservative/freq_step; # more aggressive ramping up (50) # screen off: # 10
+
+
+
+# =========
+# dirty_ratio & vfs_cache_pressure: too high (dirty_ratio) and too low values (vfs_cache_pressure) might fill up the RAM too much and end up triggering the OOM killer
+# =========
+
+# =========
+# stuff moved to the system_tweak script
+# =========
+
+#        log -p i -t screenstate_scaling "*** sleeping ***: switching CPU frequency governor to -> $SLEEP_GOVERNOR"
+        SLEEPING=
+    fi    
+done &)
+
+
+
+
+
+
+
+
+# ==============================================================
+# ==============================================================
+# ==============================================================
+# Changelog
+# ==============================================================
+# ==============================================================
+# ==============================================================
+
+# CFS stuff commented out and moved to 89system_tweak; tweaks to conservative governor
+# conservative governor with different values; tweaked conservative governor some more
+# more conservative tweaks
+# conservative for more power savings; behavior similar to SavagedZen governor
+# more tweaking & testing
+# One governor to rule them all; state-dependent memory tweaks (V22); disabled log; ramping at 10
+#
+# switch to ondemand governor (experience from users & me has shown that this one should be the optimal
+# governor for fast frequency-switching and battery savings in usage) 
+#
+# switched to smartass governor as default governor while screen is on - when 600 MHz is undervolted by -225 mV (where possible)
+# idle comes at the same cost like 400 MHz so is acceptable
+#
+# tweak the conservative governor (while screen is off) a little to make it less aggressive with ramping up but higher threshold values
+# V28: add min & max frequencies and tweak the conservative governor
+# V29: remove the raised sampling rate for conservative governor (screen off) - since that potentially lead to lags
+# while screen is on (less often polling - no sampling rate set - so the same like it was with screen off). Higher wasn't better in this case
+# V30: tweaked conservative governor some more
+# V31: switch to SavagedZen for default governor (while screen is on)
+# V32: switched back to smartass for default
+# V33: tweaks to smartass governor, added aggressive conservative powersaving options [uncommented - might lead to stuttering in sound playback]
+# V34: tweak smartass governor previous tweaks were too conservative - non-smooth GUI
+# V35: some minor tweaks to screen-off conservative governor
+# V36: config for forked & optimized Talon Kernel
+# V37: even more tweaks to memory settings & governors
+# V38: reduce the waiting time to apply the governor to 2 seconds (from 5)
+# V39: do some more tweaks to the page-cache & dirty_ratio [thanks to Juwe11 for some ideas on how to tweak it properly !]
+# V40: working around the issue that PowerAmp and other players consume too much cpu power & sound lags (less min-max like behavior)
+# V41: conservative governor (screen on) back to old (smoother) behavior
+# V42: switched to ondemand governor (screen on)
+# V43: moved stuff around and added some tags to make things more clear
+# V44: added some more settings
+# V45: some more descriptions
+# V46: added explanation to powersave governor
+# V47: Documentation part rewrite (not finished yet)
+# V48: moved stuff to the system_tweak script
+# V49: pre-set governors: awake_governor ondemand, sleep_governor conservative
+# V50: added ondemandb & set it as awake_governor, test-changes to conservative governor (sleep_governor) - should work fine with DSP Manager & other stuff
+# V51: add smartassV2 to the list of possible AWAKE_GOVERNOR & SLEEP_GOVERNOR
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ==============================================================
+# ==============================================================
+# ==============================================================
+# test settings for while screen is on
+# ==============================================================
+# ==============================================================
+# ==============================================================
+
+
+
+# =========
+# Ondemand settings [more aggressive power savings]
+# =========
+
+#        echo "98" > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold       
+####	echo "300000" > /sys/devices/system/cpu/cpu0/cpufreq/conservative/sampling_rate
+
+# =========
+# Ondemand settings [experimental] (max frequency at 800 MHz, 
+# more aggressive up- and down-sampling while staying longer at higher frequencies during load)
+# =========
+
+#        echo "100" > /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor
+#        echo "200" > /sys/devices/system/cpu/cpufreq/ondemand/powersave_bias
+#        echo "100000" > /sys/devices/system/cpu/cpufreq/ondemand/sampling_rate
+
+        # VM parameters;
+
+
+
+
+
+# ==============================================================
+# ==============================================================
+# ==============================================================
+# test settings for while screen is off
+# ==============================================================
+# ==============================================================
+# ==============================================================
+
+
+
+# =========
+# Conservative settings [very conservative](conservative SLEEP_GOVERNOR)
+# =========
+#        echo "90" > /sys/devices/system/cpu/cpufreq/conservative/up_threshold
+#        echo "50" > /sys/devices/system/cpu/cpufreq/conservative/down_threshold
+#        echo "10" > /sys/devices/system/cpu/cpufreq/conservative/freq_step
+#        echo "500000" > /sys/devices/system/cpu/cpu0/cpufreq/conservative/sampling_rate
+
+
+        # tweaking up- and down_threshold for power efficiency (only up_threshold exists with ondemand !)
+#        echo "98" > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold
+#        echo "76" > /sys/devices/system/cpu/cpufreq/conservative/up_threshold # 76
+#        echo "30" > /sys/devices/system/cpu/cpufreq/conservative/down_threshold # 30
+#        echo "20" > /sys/devices/system/cpu/cpufreq/conservative/freq_step
+        # VM parameters;
+
+
+# =========
+# Conservative settings [SavagedZen governor-like] (recommended when screen on, might consume more battery when screen off since it does not scale through all frequencies)
+# settings for screen off (can be more aggressive)
+# =========
+
+#        echo "50" > /sys/devices/system/cpu/cpufreq/conservative/up_threshold # 50 # 76 # 76 # screen off: # 90 (probably too high) # 76 ## 50
+#        echo "35" > /sys/devices/system/cpu/cpufreq/conservative/down_threshold # 35 # 12 # 30 (higher will lead to noticable lags) # 35 # screen off: # 50 ## 35
+#        echo "50" > /sys/devices/system/cpu/cpufreq/conservative/freq_step # more aggressive ramping up (50) # screen off: # 10
+######        echo "400000" > /sys/devices/system/cpu/cpu0/cpufreq/conservative/sampling_rate # 375000 # 500000 # 80000 # screen off: # 400000 (test)
+
+
+
+

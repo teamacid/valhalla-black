@@ -1,0 +1,142 @@
+ui_print("@ Mounting partitions");
+show_progress(0.0, 0);
+run_program("/sbin/mount", "/dev/block/stl9 /system");
+run_program("/sbin/mount", "/dev/block/stl10 /data");
+run_program("/sbin/mount", "/dev/block/stl11 /cache");
+
+# For all the option-checking conditionals,
+# install_type 1 = "typical" installation
+# install_type 2 = "customized" installation
+# if customized, check if the option for this action was selected
+if
+ (file_getprop("/tmp/aroma-data/install_type.prop","selected") == "1" || 
+ file_getprop("/tmp/aroma-data/options.prop","item.1.1") == "1")
+then
+  ui_print("@ Wiping Dalvik cache");
+  delete_recursive("/data/dalvik-cache");
+  set_progress(0.1);
+endif;
+
+if
+  (file_getprop("/tmp/aroma-data/install_type.prop","selected") == "1" || 
+  file_getprop("/tmp/aroma-data/options.prop","item.1.2") == "1")
+then
+  ui_print("@ Wiping /system");
+  delete_recursive("/system");
+  set_progress(0.15);
+endif;
+
+if
+ (file_getprop("/tmp/aroma-data/install_type.prop","selected") == "1" || 
+ file_getprop("/tmp/aroma-data/data_wipe.prop","wipe") == "1")
+ # The user had to confirm that they did want the data wipe.
+then
+  ui_print("@ Wiping /data");
+  delete_recursive("/data");
+  set_progress(0.2);
+endif;
+
+if
+ (file_getprop("/tmp/aroma-data/install_type.prop","selected") == "1" ||
+ file_getprop("/tmp/aroma-data/options.prop","item.1.4") == "1")
+then
+  ui_print("@ Wiping /cache");
+  delete_recursive("/cache");
+  set_progress(0.3);
+endif;
+
+
+# We are wiping /cache by default.
+  
+
+ui_print("@ Extracting Files");
+# show progress takes two arguments
+# how much to increment the progress
+# and how many files are gonna get transferred.
+# 700 is a good default for files transferred on a Gingerbread ROM.
+show_progress(0.2, 700);
+ui_print("Extracting /system");
+package_extract_dir("system", "/system");
+ui_print("Extracting /data");
+package_extract_dir("data", "/data");
+ui_print("Extracting /sdard");
+package_extract_dir("sdcard", "/sdcard");
+ui_print("Extracting updates");
+package_extract_dir("updates", "/tmp/updates");
+set_progress(0.5);
+
+ui_print("@ Setting up toolbox");
+symlink("dumpstate","/system/bin/dumpcrash");
+symlink("debuggerd", "/system/bin/csview");
+symlink("/system/xbin/su", "/system/bin/su");
+symlink("toolbox","/system/bin/cat","/system/bin/chmod","/system/bin/chown","/system/bin/cmp","/system/bin/date","/system/bin/dd",
+        "/system/bin/df","/system/bin/dmesg","/system/bin/getevent","/system/bin/getprop","/system/bin/hd","/system/bin/id",
+        "/system/bin/ifconfig","/system/bin/iftop","/system/bin/insmod","/system/bin/ioctl","/system/bin/ionice","/system/bin/kill",
+        "/system/bin/ln","/system/bin/log","/system/bin/ls","/system/bin/lsmod","/system/bin/mkdir","/system/bin/mount",
+        "/system/bin/mv","/system/bin/nandread","/system/bin/netstat","/system/bin/newfs_msdos","/system/bin/notify",
+        "/system/bin/printenv", "/system/bin/ps","/system/bin/reboot","/system/bin/renice","/system/bin/rm","/system/bin/rmdir",
+        "/system/bin/rmmod","/system/bin/route","/system/bin/schedtop","/system/bin/sendevent","/system/bin/setconsole",
+        "/system/bin/setprop","/system/bin/sleep","/system/bin/smd","/system/bin/start","/system/bin/stop","/system/bin/sync",
+        "/system/bin/top","/system/bin/umount","/system/bin/vmstat","/system/bin/watchprops","/system/bin/wipe");
+set_progress(0.6);
+
+ui_print("@ Setting permissions");
+set_perm_recursive(0, 0, 0755, 0644, "system");
+set_perm_recursive(0, 2000, 0755, 0755, "system/bin");
+set_perm_recursive(0, 0, 0755, 0755, "system/etc");
+set_perm_recursive(0, 0, 0755, 0755, "system/etc/bluetooth");
+set_perm_recursive(1002, 1002, 0755, 0440, "system/etc/bluetooth");
+set_perm_recursive(0, 0, 0777, 0777, "system/etc/init.d");
+set_perm(0, 0, 0755, "/system/etc/bluetooth");
+set_perm(0, 3003, 02755, "/system/bin/netcfg");
+set_perm(0, 3004, 02755, "/system/bin/ping");
+set_perm(1002, 1002, 0440, "/system/etc/dbus.conf");
+set_perm(1014, 2000, 0550, "/system/etc/dhcpcd/dhcpcd-run-hooks");
+set_perm(0, 2000, 0550, "/system/etc/init.goldfish.sh");
+set_perm(0, 0, 04755, "/system/xbin/su");
+set_perm(0, 0, 04755, "/system/xbin/busybox");
+set_perm(0, 0, 755, "/tmp/updates/redbend_ua");
+set_progress(0.7);
+
+if
+ (file_getprop("/tmp/aroma-data/install_type.prop","selected") == "1" || 
+ file_getprop("/tmp/aroma-data/options.prop","item.2.1") == "1")
+then
+  ui_print("@ Flashing modem");
+  run_program("/tmp/updates/redbend_ua", "restore", "/tmp/updates/modem.bin", "/dev/block/bml12");
+  set_progress(0.9);
+endif;
+
+if
+ (file_getprop("/tmp/aroma-data/install_type.prop","selected") == "1" || 
+ file_getprop("/tmp/aroma-data/options.prop","item.2.2") == "1")
+then
+  ui_print("@ Flashing kernel");
+  run_program("/tmp/updates/redbend_ua", "restore", "/tmp/updates/zImage", "/dev/block/bml7");
+  set_progress(0.95);
+endif;
+
+if
+ (file_getprop("/tmp/aroma-data/install_type.prop","selected") == "1" || 
+ file_getprop("/tmp/aroma-data/options.prop","item.3.1") == "1")
+then
+  ui_print("@ Installing busybox");
+  run_program("system/xbin/busybox", "--install", "-s", "/system/xbin");
+  set_progress(0.8);
+endif;
+
+ui_print("@ Unmounting mount points");
+run_program("/sbin/umount", "/system");
+run_program("/sbin/umount", "/data");
+run_program("/sbin/umount", "/cache");
+set_progress(1.0);
+show_progress(1.0, 0);
+
+ui_print("@ Update complete");
+
+if
+ (file_getprop("/tmp/aroma-data/options.prop","item.4.1") == "1")
+then
+  ui_print("@ Rebooting phone");
+  run_program("/sbin/reboot");
+endif;

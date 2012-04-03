@@ -1,0 +1,6 @@
+#!/system/bin/sh
+#
+
+mount -o remount,noatime,auto_da_alloc,barrier=0 /system /system
+mount -o remount,noatime,auto_da_alloc,barrier=0 /cache /cache
+mount -o remount,noatime,delalloc,noauto_da_alloc,barrier=1 /data /data
