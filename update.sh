@@ -1,5 +1,5 @@
 #!/bin/bash
-input_file="update.zip"
+input_file="installer.zip"
 remote_dir="/sdcard"
 remote_file="update.zip"
 
