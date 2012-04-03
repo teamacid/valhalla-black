@@ -1,41 +1,89 @@
-##
-# ROM Information
-#
-
-# Load ROM information into tmp directory
-writetmpfile("rom.prop",readfile_aroma("rom.prop"));
-
-# Configure the variables
-setvar("rom_name",file_getprop("/tmp/aroma-data/rom.prop","rom_name"));
-setvar("rom_version",file_getprop("/tmp/aroma-data/rom.prop","rom_version"));
-setvar("rom_author",file_getprop("/tmp/aroma-data/rom.prop","rom_author"));
-setvar("rom_device",file_getprop("/tmp/aroma-data/rom.prop","rom_device"));
-setvar("rom_date",file_getprop("/tmp/aroma-data/rom.prop","rom_date"));
-setvar("rom_packager",file_getprop("/tmp/aroma-data/rom.prop","rom_packager"));
-
-##
-# Files
-#
-setvar("file_splash_img",      "splash");
-setvar("file_agreement",       readfile_aroma("agreement.txt"));
-setvar("file_changelog",       readfile_aroma("changelog.txt"));
-
 ###############################################################
-# Configuration complete.                                     #
-#                                                             #
 # Please do not edit any of the options below unless          #
 # you know what you're doing!                                 #
 ###############################################################
 
+##
+# Configure the variables
+#
+setvar("rom_name",     resprop("rom.prop", "rom_name"));
+setvar("rom_version",  resprop("rom.prop", "rom_version"));
+setvar("rom_author",   resprop("rom.prop", "rom_author"));
+setvar("rom_device",   resprop("rom.prop", "rom_device"));
+setvar("rom_date",     resprop("rom.prop", "rom_date"));
+setvar("rom_packager", resprop("rom.prop", "rom_packager"));
+
+##
+# Aroma variables
+#
+setvar("phone_model", "SGH-T959V");
+setvar("phone_name", "Samsung Galaxy S 4G");
+
+##
+# Splash screen
+#
+splash(4000, "splash");
+
+##
+# Tasks to run before the installer starts
+#
+# Mount all the mount points. We can manipulate the filesystem before the install.
+#
+run_program("/sbin/mount", "/dev/block/stl9 /system");
+run_program("/sbin/mount", "/dev/block/stl10 /data");
+run_program("/sbin/mount", "/dev/block/mmcblk0p1 /sdcard");
+
+##
+# Default installation options
+#
+setvar("option_install_type",     1);
+setvar("option_do_data_backup",   0);
+setvar("option_install_modem",    1);
+setvar("option_install_kernel",   1);
+setvar("option_reboot_phone",     1);
+
+##
+# SET THEME
+#
+# Look under aroma/themes/ for theme files
+#
+theme("ics");
+
+##
+# Set fonts
+#
+# Do we want to reboot the phone after install?
+if
+  # Make sure that the zip file build.prop exists, which probably means that the font exists
+  zipprop("system/build.prop", "ro.product.device") != ""
+then
+  # We're loading the font from the ROM directory
+  setvar(font_path, "system/fonts/DroidSans.ttf");
+  fontload( "0", getvar(font_path), "12" ); #-- "0" = Small Font ( Look at Fonts & UNICODE Demo Below )
+  fontload( "1", getvar(font_path), "18" ); #-- "1" = Big Font
+else
+  # We'll use aroma's font
+  setvar(font_path, "ttf/Roboto-Regular.ttf");
+  fontresload( "0", getvar(font_path), "12" ); #-- "0" = Small Font ( Look at Fonts & UNICODE Demo Below )
+  fontresload( "1", getvar(font_path), "18" ); #-- "1" = Big Font
+endif;
+
+
+##
+# Files
+#
+setvar("file_agreement", readfile_aroma("agreement.txt"));
+
+##
 # Set up variables
-ini_set("rom_name",             getvar("rom_name"));
-ini_set("rom_version",          getvar("rom_version"));
-ini_set("rom_author",           getvar("rom_author"));
-ini_set("rom_device",           getvar("rom_device"));
+#
+ini_set("rom_name",    getvar("rom_name"));
+ini_set("rom_version", getvar("rom_version"));
+ini_set("rom_author",  getvar("rom_author"));
+ini_set("rom_device",  getvar("rom_device"));
 
 ##
 # Calibrate Touchscreen
-#  defaut: HTC Desire Touch Screen Calibrate Data 8,-20,8,-20
 #
 # For other device, run the installer, then press "menu"
 # and select Calibrating Tools. Follow Instructions, and make
@@ -45,173 +93,150 @@ ini_set("rom_device",           getvar("rom_device"));
 # ( green ), replace this calibrate() function with that data.
 #
 # These are the defaults for the SGS4G
-calibrate("0.8809","26","0.9507","19");
+calibrate("0.88558", "42", "0.9346", "22", "yes");
 
 ##
-# Set UI Color
-# foo   = Main Color ( If Gradient, it was Top Color )
-# foo_g = Main Color Gradient ( Bottom Color )
+# Rom information screen
 #
-#   winbg       : Main/Top Most Window Backgroud
-#   textbg      : Textbox, Checkbox, and any scrollable UI Background
-#   textfg      : Textbox, Checkbox, and any scrollable UI Text Foreground
-#   textfg_gray : Gray Text ( on Optionbox/Checkbox Item Description )
-#   controlbg   : Control / Button / Checkbox border - Background Color
-#   controlfg   : Button Text Color
-#   selectbg    : Selected Element Background ( Pushed/focused Button/items, etc )
-#   selectfg    : Selected Element Text/Foreground Color
-#   titlebg     : Window Title Background
-#   titlefg     : Window Title Text Foreground Color
-#   navbg       : Bottom Bar (Navigation Bar) Background. Next-Previous Area
-#   border      : Common Border Color
-#
-#
-# Supported 3 & 6 Char Hex Colors:
-#   #fff or #ffffff
-#   #469 or #46689a
-#
-setcolor("winbg",       "#444");
-setcolor("winbg_g",     "#000");
-setcolor("textbg",      "#333");
-setcolor("textfg",      "#fff");
-setcolor("textfg_gray", "#bbb");
-setcolor("controlbg",   "#444");
-setcolor("controlbg_g", "#000");
-setcolor("controlfg",   "#fff");
-setcolor("selectbg",    "#653");
-setcolor("selectbg_g",  "#542");
-setcolor("selectfg",    "#ffd");
-setcolor("titlebg",     "#333");
-setcolor("titlebg_g",   "#000");
-setcolor("titlefg",     "#fff");
-setcolor("navbg",       "#333");
-setcolor("navbg_g",     "#222");
-setcolor("border",      "#666");
-setcolor("border_g",    "#444");
-
-splash(4000, getvar("file_splash_img"));
-
 viewbox(
   # Arg 1
     "Welcome",
-  
   # Arg 2
-    "You are about to install:\n" +
-    "<#080>"+getvar("rom_name") + "</#>\n\n"+
-    "Created By:\n" +
-    "<#080>"+getvar("rom_author") + "</#>\n\n"+
-    "Designed for:\n" +
-    "<#080>"+getvar("rom_device") + "</#>\n\n"+
-    "Version:\n"+
-    "<#080>"+getvar("rom_version")+"</#>\n\n"+
-    "Updated:\n"+
-    "<#080>"+getvar("rom_date")+"</#>\n\n"+
-    "Installer By:\n"+
-    "<#080>"+getvar("rom_packager")+"</#>\n\n\n"+
-    "Select Next to continue."+
+    "<@center>" +
+    "<b>"    +
+		"<#selectbg_g>" + getvar("rom_name")     + "</#>\n" +
+    "<#selectbg_g>" + getvar("rom_version")  + "</#>\n" +
+    "</b>\n" +
+    
+    "by\n\n"   +
+    
+    "<b>"    +
+    "<#selectbg_g>" + getvar("rom_author")   + "</#>\n" +
+    "\n" +
+    
+    "<#selectbg_g>" + getvar("rom_date")     + "</#>\n" +
+    "<#selectbg_g>" + getvar("rom_device")   + "</#>\n" +
+    "</b>\n" +
+
+    "AROMA Installer ported by\n" +
+    "<b>" +
+    "<#selectbg_g>" + getvar("rom_packager") + "</#>\n" +
+    "</b></@>\n\n"+
+    
+    "Select Next to continue." +
     "",
-  
   # Arg 3
     "icons/info"
 );
 
 if
+  # Check if we're using the correct phone_model
+  file_getprop("/system/build.prop", "ro.product.device") != getvar("phone_model")
+then
+  # Check if the phone model exists in build.prop
+  setvar("current_device",file_getprop("/system/build.prop", "ro.product.device"));
+  if
+  file_getprop("/system/build.prop", "ro.product.device") == ""
+  then
+    # Since the file wasn't found we'll just say unknown
+    setvar("current_device", "Unknown");
+  endif;
+  
+  if
+    confirm(
+      # Arg 1
+      "Unknown Device!",
+      # Arg 2
+      "This ROM is only for the\n" +
+      "<b><#selectbg_g>" + getvar("phone_name") + " (" + getvar("phone_model") + ").</#></b>\n\n" +
+      
+      "You are using the following device:\n" +
+      "<b><#selectbg_g>" +
+      getvar("current_device") +
+      "</#></b>\n\n" +
+      
+      "<#F00>Continuing with the installation may cause your phone to brick.</#>\n\n" +
+      
+      "Would you like to continue?",
+      # Arg 3
+      "icons/alert",
+      # Arg 4
+      "Yes",
+      # Arg 5
+      "No"
+    ) == "no"
+  then
+    exit();
+  endif;
+endif;
+
+if
   # This is where we check if the user is on a version we don't want.
   # If this is a Gingerbread ROM, the user has Froyo bootloaders so our ROM
   # won't work correctly.
-  file_getprop("/system/build.prop","ro.build.id") == "FROYO"
+  file_getprop("/system/build.prop", "ro.build.id") == "FROYO"
 then
   alert(
     # Arg 1
       "You are not on Gingerbread!",
-    
     # Arg 2
       "This ROM will only work if you are running Gingerbread.\n" +
       "You are currently running Froyo.\n" +
       "Please find instructions on how to install this rom.\n"+
       "Thank you.",
-    
     # Arg 3
       "icons/alert",
-    
     # Arg 4
       "Exit Installation"
   );
   exit();
 endif;
-
+    
 agreebox(
   # Arg 1
     "Terms Of Use",
-  
   # Arg 2
     "Please read the Terms of Use below.",
-  
   # Arg 3
     "icons/agreement",
-  
   # Arg 4
     getvar("file_agreement"),
-  
   # 5
     "I agree to the Terms of Use.",
-  
   # 6
     "Please agree to the Terms of Use to continue with the installation."
-);
-
-textbox(
-  # Arg 1
-    "Changelog",
-  
-  # Arg 2
-  getvar("rom_name"),
-  
-  # Arg 3
-    "icons/info",
-  
-  # Arg 4
-    getvar("file_changelog");
 );
 
 menubox(
   # Title
     "Install Type",
-  
   # Sub Title
-    "Choose a typical or customized installation.",
-  
+    "Choose a quick or customized installation.",
   # Icon
     "icons/install",
-    
   # Will be saved in /tmp/aroma-data/<file>
     "install_type.prop",
-    
   # Items ( per 3 arguments ): Title, Subtitle/description, Icon
     # Item 1
-    "Typical",    "Install default recommended packages into your phone.", "icons/install",
-    
+    "Quick",      "Install default recommended packages into your phone.", "icons/install",
     # Item 2
-    "Customize",  "Install only selected packages into your phone.", "icons/apps"
+    "Customized", "Choose what you would like installed on your phone.", "icons/apps"
 );
+setvar("option_install_type", prop("install_type.prop", "selected"));
 
 if
   # User chose customized installation
-  file_getprop("/tmp/aroma-data/install_type.prop","selected") == "2"
+  getvar("option_install_type") == "2"
 then
   checkbox(
     # Title
       "Select Installation Options",
-    
     # Sub Title
       "Please select installation options below:",
-    
     # Icon
       "icons/apps",
-    
     # Will be saved in /tmp/aroma-data/<file>
-      "options.prop",
-    
+      "customized.prop",
     # Items ( per 3 arguments ): Title, Subtitle/description, Item Type
     #   Item Type:
     #   0 = Unchecked by default
@@ -219,88 +244,77 @@ then
     #   2 = Item Group Title ( the subtitle won't be used )
     #
       # Group 1
-      "ROM Options","",2,
-        
+      "Backup Options", "", 2,
         # Item 1.1
-        "Wipe Dalvik cache",
-          "Deletes this cache. Safe and recommended for all installations.",1,
-        
-        # Item 1.2
-        "Wipe /system.",
-          "Deletes all files from this partition. Recommended if you're coming from another ROM.", 1,
-        
-        # Item 1.3
-        "Wipe /data.",
-          "Deletes all files from this partition. Recommended if you're coming from another ROM. Don't select if you want to keep your apps and customizations.", 0,
-        
-        # Item 1.4
-        "Wipe /cache.",
-          "Deletes all files from this partition. Recommended in all instances.", 0,
-      
+        "Backup /data partition",
+          "Makes a backup of your whole /data partition (apps and settings).",1,
       # Group 2
-      "Modem and Kernel","",2,
+      "Modem and Kernel", "", 2,
         # Item 2.1
         "Install Modem",
           "Samsung Galaxy S 4G KJ6 Modem.", 1,
-        
         # Item 2.2
         "Install Kernel",
-          "bhundven's SMS-KJ6 Kernel.",1,
-        
-      # Group 3
-      "Other customizations","",2,
-        # Item 3.1
-        "Install busybox",
-          "(Recommended) Used by many command-line programs.", 1,
-      
-      # Group 4
-      "Post Installation Options","",2,
-        # Item 4.1
-        "Reboot Phone",
-          "Restarts the phone as soon as the installation is finished.", 1
-        
-        # TODO enable this through file in sdcard
-        # enable lagfix
-        # "Enable lagfix on reboot.",
-        #   "Recommended if you want a speed boost.", 0,
-        
-      
+          "bhundven's SMS-KJ6 Kernel.", 1
   );
+  
+  # Now we set the customized variables.
+  setvar("option_do_data_backup", prop("customized.prop", "item.1.1"));
+  setvar("option_install_modem",  prop("customized.prop", "item.2.1"));
+  setvar("option_install_kernel", prop("customized.prop", "item.2.2"));
 endif;
 
-# If the user customized the installation, make sure they know that
-# the /data partition is getting wiped.
 if
-  file_getprop("/tmp/aroma-data/install_type.prop","selected") == "2"
+  # Check to see if we have enough free space on /sdcard for a data backup
+  (getvar("option_do_data_backup") &&
+   cmp(getdisksize("/data", "m"), ">",getdiskfree("/sdcard", "m")))
 then
   if
-  confirm("Wipe /data",
-    "You have selected that you would like to wipe /data.\n"+
-    "This will delete all your installed applications and settings.\n\n"+
-    "If you would like to wipe this partition, select Yes.\n\n"+
-    "If you would NOT like to wipe this partition, select No.\n",
-    "icons/alert",
-    "Yes",
-    "No"
-  ) == "no"
+    confirm(
+      # Arg 1
+      "Not enough space",
+      # Arg 2
+			"You do not have enough space on your SD card to make a backup\n" +
+			"Space Available: <b><#selectbg_g>"+getdiskfree("/sdcard", "m")+" MB</#></b>\n"+
+			"Space Required : <b><#selectbg_g>"+getdisksize("/data", "m")  +" MB</#></b>\n\n"+
+      
+			"Even if you selected the data backup option in Customized Install, no " +
+			"backup will be made. If you haven't already made a Titanium or " +
+			"nandroid backup your data will be lost!\n" +
+      "Would you like to continue?",
+      # Arg 3
+      "icons/alert",
+      # Arg 4
+      "Yes",
+      # Arg 5
+      "No"
+    ) == "no"
   then
-    # User selected no, so we're setting wipe to 0
-    writetmpfile(
-      "data_wipe.prop",
-      "wipe=0\n"
-    );
+    exit();
   else
-    writetmpfile(
-      "data_wipe.prop",
-      "wipe=1\n"
-    );
+    # Not enough free space to do the backup, so we disable it.
+    setvar("option_do_data_backup", 0);
   endif;
 endif;
 
+##
+# Now we write out all our install options
+#
+writetmpfile(
+  "options.prop",
+  "option_install_type="   + getvar("option_install_type")    + "\n" +
+  "option_do_data_backup=" + getvar("option_do_data_backup")  + "\n" +
+  "option_install_modem="  + getvar("option_install_modem")   + "\n" +
+  "option_install_kernel=" + getvar("option_install_kernel")  + "\n" +
+  "option_reboot_phone="   + getvar("option_reboot_phone")    + "\n" +
+  "\n"
+);
+
 install(
   "Installing",
-  getvar("rom_name")+"\n"+
-  "Please wait until the install completes.",
+  getvar("rom_name") + "\n" +
+  "Please wait until the install completes." +
+  "",
   "icons/install"
 );
 
@@ -308,8 +322,21 @@ ini_set("text_next", "Finish");
 
 viewbox(
   "Installation Completed",
-    "<#080>Congratulations!</#>\n\n"+
-    getvar("rom_name")+ " has successfully installed.\n"+
-    "Select Finish to exit the installation.",
+    "<b><#selectbg_g>Congratulations!</#></b>\n\n" +
+    getvar("rom_name") + " has successfully installed.\n" +
+    "Select Finish to exit.",
   "icons/info"
 );
+
+# Do we want to reboot the phone after install?
+if
+  confirm(
+    "Reboot phone?",
+    "Would you like to reboot your phone now?\n",
+    "icons/info",
+    "Yes",
+    "No"
+  ) == "yes"
+then
+  reboot("onfinish");
+endif;
