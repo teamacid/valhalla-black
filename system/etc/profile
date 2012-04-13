@@ -1,1 +1,3 @@
 alias l='ls -lh --color=auto'
+alias zip9='7z -mx9 -tzip a'
+alias zip='7z -tzip a'
