@@ -14,7 +14,7 @@ fi
 # Main script
 echo "Creating zip file"
 rm -f $input_file
-zip --quiet -r -9 $input_file data META-INF system tools updates
+zip -r -9 $input_file data META-INF system tools updates
 
 echo "Transferring installer"
 adb push $input_file $remote_dir/$remote_file
