@@ -12,8 +12,10 @@ if [ "$1" == "backup" ]; then
 fi
 
 # Main script
-echo "Creating zip file"
+echo "Removing old zip file"
 rm -f $input_file
+
+echo "Creating zip file"
 zip -r -9 $input_file data META-INF system tools updates
 
 echo "Transferring installer"
