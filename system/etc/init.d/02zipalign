@@ -24,38 +24,56 @@ rm -rf $LOG_FILE
 
 echo "Starting Automatic ZipAlign $( date +"%m-%d-%Y %H:%M:%S" )" | tee -a $LOG_FILE;
     for apk in /data/app/*.apk ; do
-      zipalign -c 4 $apk;
-      ZIPCHECK=$?;
-      if [ $ZIPCHECK -eq 1 ]; then
-        echo ZipAligning $(basename $apk)  | tee -a $LOG_FILE;
-        zipalign -f 4 $apk /cache/$(basename $apk);
-          if [ -e /cache/$(basename $apk) ]; then
-            cp -f -p /cache/$(basename $apk) $apk  | tee -a $LOG_FILE;
-            rm /cache/$(basename $apk);
-          else
-            echo ZipAligning $(basename $apk) Failed  | tee -a $LOG_FILE;
-          fi;
-      else
-        echo ZipAlign already completed on $apk  | tee -a $LOG_FILE;
-      fi;
-    done;
+	zipalign -c 4 $apk;
+	ZIPCHECK=$?;
+	if [ $ZIPCHECK -eq 1 ]; then
+		echo ZipAligning $(busybox basename $apk)  | tee -a $LOG_FILE;
+		zipalign -f 4 $apk /cache/$(basename $apk);
+			if [ -e /cache/$(busybox basename $apk) ]; then
+				cp -f -p /cache/$(busybox basename $apk) $apk  | tee -a $LOG_FILE;
+				rm /cache/$(busybox basename $apk);
+			else
+				echo ZipAligning $(busybox basename $apk) Failed  | tee -a $LOG_FILE;
+			fi;
+	else
+		echo ZipAlign already completed on $apk  | tee -a $LOG_FILE;
+	fi;
+       done;
 	   
 	echo "Attempting to zipalign frameworks";
 	for apk1 in /system/framework/*.apk ; do
-    zipalign -c 4 $apk1;
-    ZIPCHECK1=$?;
-    if [ $ZIPCHECK1 -eq 1 ]; then
-      echo ZipAligning $(basename $apk1)  | tee -a $LOG_FILE;
-      zipalign -f 4 $apk1 /cache/$(basename $apk1);
-        if [ -e /cache/$(basename $apk1) ]; then
-          cp -f -p /cache/$(basename $apk1) $apk1  | tee -a $LOG_FILE;
-          rm /cache/$(basename $apk1);
-        else
-          echo ZipAligning $(basename $apk1) Failed  | tee -a $LOG_FILE;
-        fi;
-    else
-      echo ZipAlign already completed on $apk1  | tee -a $LOG_FILE;
-    fi;
-  done;
-
+	zipalign -c 4 $apk1;
+	ZIPCHECK1=$?;
+	if [ $ZIPCHECK1 -eq 1 ]; then
+		# echo ZipAligning $(busybox basename $apk1)  | tee -a $LOG_FILE;
+		# zipalign -f 4 $apk1 /cache/$(busybox basename $apk1);
+			# if [ -e /cache/$(busybox basename $apk1) ]; then
+				# cp -f -p /cache/$(busybox basename $apk1) $apk1  | tee -a $LOG_FILE;
+				# rm /cache/$(busybox basename $apk1);
+			# else
+				# echo ZipAligning $(busybox basename $apk1) Failed  | tee -a $LOG_FILE;
+			# fi;
+	# else
+		# echo ZipAlign already completed on $apk1  | tee -a $LOG_FILE;
+	# fi;
+       # done;
+	   
+	# echo "Attempting to zipalign system apps";
+	# for apk1 in /system/app/*.apk ; do
+	# zipalign -c 4 $apk1;
+	# ZIPCHECK1=$?;
+	# if [ $ZIPCHECK1 -eq 1 ]; then
+		echo ZipAligning $(busybox basename $apk1)  | tee -a $LOG_FILE;
+		zipalign -f 4 $apk1 /cache/$(busybox basename $apk1);
+			if [ -e /cache/$(busybox basename $apk1) ]; then
+				cp -f -p /cache/$(busybox basename $apk1) $apk1  | tee -a $LOG_FILE;
+				rm /cache/$(busybox basename $apk1);
+			else
+				echo ZipAligning $(busybox basename $apk1) Failed  | tee -a $LOG_FILE;
+			fi;
+	else
+		echo ZipAlign already completed on $apk1  | tee -a $LOG_FILE;
+	fi;
+       done;
+	   
 echo "Automatic ZipAlign finished at $( date +"%m-%d-%Y %H:%M:%S" )" | tee -a $LOG_FILE;

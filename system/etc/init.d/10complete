@@ -1,8 +1,6 @@
 #!/system/bin/sh
 echo 'Running complete'
 
-sync;
-
 # Remounts
 busybox mount -o remount,noatime,nobh,nodiratime,nodelalloc,noauto_da_alloc,barrier=0 /system /system
 busybox mount -o remount,noatime,nobh,nodiratime,nodelalloc,noauto_da_alloc,barrier=0 /cache /cache
