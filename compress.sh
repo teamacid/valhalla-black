@@ -40,9 +40,6 @@ if [ "$1" == "update" ]; then
   exit 0
 fi
 
-
-exit
-
 # Main script
 echo "Removing old zip file"
 rm -f $input_file
