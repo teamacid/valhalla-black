@@ -27,6 +27,7 @@ if [ "$1" == "update" ]; then
     com.touchtype.swiftkey.phone.trial-1.apk
     name.markus.droesser.tapeatalk-1.apk
     jackpal.androidterm-1.apk
+    org.projectvoodoo.controlapp-1.apk
   )
 
   # Now we go through each app in the list and pull it off the phone
