@@ -3,13 +3,44 @@ input_file="installer.zip"
 remote_dir="/sdcard"
 remote_file="update.zip"
 
-if [ "$1" == "backup" ]; then
-  adb push tools/data-backup /tmp/
-  adb push tools/data-restore /tmp/
-  adb push system/xbin/busybox /tmp/
-  adb shell 'chmod +x /tmp/*'
-  exit
+clear
+
+if [ "$1" == "update" ]; then
+  # This is where we update the apps. Normally you'll want to update the app on
+  # the VB install on your phone, then run this.
+  
+  # TitaniumBackup is the only app that we'll grab from the web
+  wget -O data/app/com.keramidas.TitaniumBackupPro-1.apk http://matrixrewriter.com/android/files/TitaniumBackup_latest.apk
+
+  # All these apps we're going to pull from the phone
+  cd data/app
+  apps=(
+    com.alensw.PicFolder-1.apk
+    neldar.bln.control.free-1.apk
+    com.boatbrowser.free-1.apk
+    com.jb.gosms-1.apk
+    com.gau.go.launcherex-1.apk
+    kov.theme.ics-1.apk
+    com.mxtech.ffmpeg.v7_neon-1.apk
+    com.mxtech.videoplayer.ad-1.apk
+    QuickBoot.apk
+    com.touchtype.swiftkey.phone.trial-1.apk
+    name.markus.droesser.tapeatalk-1.apk
+    jackpal.androidterm-1.apk
+  )
+
+  # Now we go through each app in the list and pull it off the phone
+  for app in "${apps[@]}"; do
+    echo "Pulling ${app}"
+    adb pull /data/app/${app}
+  done
+
+  echo "Update complete. Exiting."
+  exit 0
 fi
+
+
+exit
 
 # Main script
 echo "Removing old zip file"
