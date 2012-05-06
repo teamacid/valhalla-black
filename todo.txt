@@ -2,6 +2,7 @@
 nano http://forum.xda-developers.com/showthread.php?t=1530519
 ssh
 scp
+Add update checker (same as scom)
 
 ## DONE ##
 bash http://wistreetscene.com/roy/download/bash-arm
