@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RomConfig>
+  <RomName>Valhalla Black FB Edition</RomName>
+  <RomVersion>4</RomVersion>
+  <RomCheckUrl>http://fbis251.users.sourceforge.net/update_me_check.xml</RomCheckUrl>
+  <RebootType>1</RebootType>
+</RomConfig>
+
