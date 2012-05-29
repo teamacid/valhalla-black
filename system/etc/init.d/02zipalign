@@ -6,7 +6,8 @@
 # Changelog:
 # 1.1 (12/1/09) Switched to zipalign -c 4 to check the apk instead of MD5 (oknowton)
 # 1.0 (11/30/09) Original
-echo 'Running zipalign'
+# Output the script name for easier run-parts debugging
+echo Now running $0
 
 mkdir -p /data/logs/
 LOG_FILE=/data/logs/zipalign.log

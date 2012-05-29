@@ -1,0 +1,22 @@
+#!/system/bin/sh
+#Dsexton702 sysctl tweaks
+# Output the script name for easier run-parts debugging
+echo Now running $0
+
+sysctl -p
+sync
+
+echo 325000 > /proc/sys/kernel/sched_latency_ns
+echo 175000 > /proc/sys/kernel/sched_min_granularity_ns
+echo 0 > /proc/sys/kernel/sched_wakeup_granularity_ns
+echo 0 > /proc/sys/vm/drop_caches
+echo 16000 > /proc/sys/kernel/msgmni
+echo 84000 > /proc/sys/kernel/msgmax
+
+# ondemand scheduler settings
+echo 30000 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
+echo 65 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/up_threshold
+echo 1 > /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy
+
+sync
+

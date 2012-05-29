@@ -1,5 +1,6 @@
 #!/system/bin/sh
-echo 'Running mount_rw'
+# Output the script name for easier run-parts debugging
+echo Now running $0
 
 # Make /system and / read/write
 busybox mount -o rw,remount /system

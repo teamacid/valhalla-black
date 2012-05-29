@@ -1,5 +1,6 @@
 #!/system/bin/sh
-echo 'Running complete'
+# Output the script name for easier run-parts debugging
+echo Now running $0
 
 # Remounts
 busybox mount -o remount,noatime,nobh,nodiratime,nodelalloc,noauto_da_alloc,barrier=0 /system /system
@@ -12,3 +13,4 @@ busybox mount -o ro,remount /
 
 sync;
 setprop cm.filesystem.ready 1;
+

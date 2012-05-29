@@ -2,7 +2,8 @@
 # Permission script
 # Written by Roman (birgertime)
 # www.edtdev.com
-echo 'Running perms'
+# Output the script name for easier run-parts debugging
+echo Now running $0
 
 mkdir -p /data/logs
 chmod 777 /data/logs

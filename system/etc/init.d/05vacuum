@@ -1,0 +1,50 @@
+#!/system/bin/sh
+#Defrags database files
+# Output the script name for easier run-parts debugging
+echo Now running $0
+
+LOG_FILE=/data/logs/vacuum-databases.log
+
+# do nothing if less than 7 days
+find $LOG_FILE -type f -mtime +7 -delete
+
+# Check to see if the sqlite3 binary exists
+SQL=`which sqlite3`
+echo $SQL
+if [ x = "x$SQL" ] ; then
+  echo "sqlite3 binary not found, exiting"
+  exit 1
+fi
+
+if ! test -f $LOG_FILE; then
+
+	if [ -e $LOG_FILE ]; then
+		rm $LOG_FILE;
+	fi;
+  
+	echo "Starting Sqlite Vacuum $( date +"%m-%d-%Y %H:%M:%S" )" | tee -a $LOG_FILE;
+
+	for i in \
+	`find /data -iname "*.db"`
+	do \
+		$SQL $i 'VACUUM;'; 
+		echo Vacuum $i  | tee -a $LOG_FILE;
+	done;
+
+	for i in \
+	`find /dbdata -iname "*.db"`
+	do \
+		$SQL $i 'VACUUM;'; 
+		echo Vacuum $i  | tee -a $LOG_FILE;
+	done;
+
+	for i in \
+	`find /sdcard -iname "*.db"`
+	do \
+		$SQL $i 'VACUUM;'; 
+		echo Vacuum $i  | tee -a $LOG_FILE;
+	done
+
+	echo "Sqlite Vacuum finished at $( date +"%m-%d-%Y %H:%M:%S" )" | tee -a $LOG_FILE;
+
+fi
