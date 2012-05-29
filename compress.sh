@@ -8,14 +8,15 @@ clear
 if [ "$1" == "update" ]; then
   # This is where we update the apps. Normally you'll want to update the app on
   # the VB install on your phone, then run this.
-  
-  # TitaniumBackup is the only app that we'll grab from the web
-  #wget -O data/app/com.keramidas.TitaniumBackupPro-1.apk http://matrixrewriter.com/android/files/TitaniumBackup_latest.apk
+
+  # We'll grab the following apps from the web
+  wget -O data/app/com.keramidas.TitaniumBackupPro-1.apk http://matrixrewriter.com/android/files/TitaniumBackup_latest.apk
+  wget -O system/app/UpdateMeSmartphone.apk http://dl.dropbox.com/u/3681387/UpdateMeSmartphone.apk
+  wget -O data/app/com.alensw.PicFolder-1.apk http://alensw.com/attachment/QuickPic_2.2.4.apk
 
   # All these apps we're going to pull from the phone
   cd data/app
-  apps=(
-    com.alensw.PicFolder-1.apk
+  data_apps=(
     neldar.bln.control.free-1.apk
     com.boatbrowser.free-2.apk
     com.jb.gosms-2.apk
@@ -31,7 +32,7 @@ if [ "$1" == "update" ]; then
   )
 
   # Now we go through each app in the list and pull it off the phone
-  for app in "${apps[@]}"; do
+  for app in "${data_apps[@]}"; do
     echo "Pulling ${app}"
     adb pull /data/app/${app}
   done
@@ -54,3 +55,4 @@ if [ "$?" == "0" ]; then
   echo ""
   echo "Installer transfered!"
 fi
+

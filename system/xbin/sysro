@@ -1,0 +1,7 @@
+#!/system/xbin/bash
+mount -o ro,remount /system
+mount -o ro,remount /
+sync
+
+echo "System mounted ro"
+

@@ -2,11 +2,11 @@
 rom_name=Valhalla Black
 rom_version=FB Edition
 rom_author=RaverX3X, FB
-rom_date=
+rom_date=May 29, 2012
 
 # Mod information
 rom_modem=Samsung Galaxy S 4G KG4 Modem
-rom_kernel=SMS KJ6 v0.2.0 by bhundven
+rom_kernel=Basic with a Twist by AntonX
 
 # Phone model/information
 device_model=SGH-T959V
