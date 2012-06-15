@@ -108,4 +108,4 @@ persist.service.adb.enable=1
 ro.modversion=Valhalla-BlackEdition
 
 # Rom Manager Info
-ro.rommanager.developerid=TeamNerd
+ro.rommanager.developerid=TeamAcid
