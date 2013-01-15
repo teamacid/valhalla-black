@@ -2,6 +2,7 @@
 input_file="installer.zip"
 remote_dir="/sdcard"
 remote_file="update.zip"
+ROOT_DIR=$(pwd)
 
 clear
 
@@ -12,32 +13,51 @@ if [ "$1" == "update" ]; then
   # We'll grab the following apps from the web
   wget -O data/app/com.keramidas.TitaniumBackupPro-1.apk http://matrixrewriter.com/android/files/TitaniumBackup_latest.apk
   wget -O system/app/UpdateMeSmartphone.apk http://dl.dropbox.com/u/3681387/UpdateMeSmartphone.apk
-  wget -O data/app/com.alensw.PicFolder-1.apk http://alensw.com/attachment/QuickPic_2.2.4.apk
+  wget -O data/app/com.alensw.PicFolder-1.apk http://alensw.com/attachment/QuickPic_2.8.1.apk
 
   # All these apps we're going to pull from the phone
-  cd data/app
   data_apps=(
-    neldar.bln.control.free-1.apk
-    com.boatbrowser.free-2.apk
+    com.fevdev.nakedbrowser-1.apk
     com.jb.gosms-2.apk
-    com.gau.go.launcherex-2.apk
-    kov.theme.ics-2.apk
     com.mxtech.ffmpeg.v7_neon-2.apk
     com.mxtech.videoplayer.ad-2.apk
-    QuickBoot.apk
     com.touchtype.swiftkey.phone.trial-1.apk
-    name.markus.droesser.tapeatalk-1.apk
     jackpal.androidterm-2.apk
-    org.projectvoodoo.controlapp-1.apk
+    name.markus.droesser.tapeatalk-2.apk
+    neldar.bln.control.free-2.apk
+    QuickBoot.apk
+  )
+  system_apps=(
+    org.adw.launcher.apk
+    Superuser.apk
+    VisualVoicemail.apk
   )
 
+  echo
+  echo Pulling /data apps
+  cd $ROOT_DIR/data/app
   # Now we go through each app in the list and pull it off the phone
   for app in "${data_apps[@]}"; do
     echo "Pulling ${app}"
     adb pull /data/app/${app}
   done
 
-  echo "Update complete. Exiting."
+  echo
+  echo Pulling /system apps
+  cd $ROOT_DIR/system/app
+  # Now we go through each app in the list and pull it off the phone
+  for app in "${system_apps[@]}"; do
+    echo "Pulling ${app}"
+    adb pull /system/app/${app}
+  done
+
+  echo
+  echo Updating su binary
+  cd $ROOT_DIR/system/xbin
+  # Now we go through each app in the list and pull it off the phone
+  adb pull /system/xbin/su
+
+  echo "Update complete, exiting."
   exit 0
 fi
 
